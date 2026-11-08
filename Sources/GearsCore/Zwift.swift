@@ -1,5 +1,5 @@
 /// Zwift's Bluetooth protocol, as reverse engineered by Makinolo (makinolo.com), SHIFTR and BikeControl.
-/// The trainer and the Ride shifters share it: every message is one opcode byte followed by a protobuf body.
+/// The trainer and the Ride share it: every message is one opcode byte followed by a protobuf body.
 public enum Zwift {
     /// The Zwift service. The Ride moved to the short FC82 one in a 2025 firmware; trainers keep the long one.
     public static let serviceUUIDs = ["00000001-19CA-4651-86E5-FA29DCDD09D1", "FC82"]

@@ -1,7 +1,7 @@
 import GearsCore
 import SwiftUI
 
-/// The three devices, what to do next to connect them, and the way into settings.
+/// The trainer and the Ride, what to do next to connect them, and the way into settings.
 struct DeviceBar: View {
     let connections: [DeviceRole: ConnectionState]
     let openSettings: () -> Void
@@ -10,8 +10,7 @@ struct DeviceBar: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 18) {
                 DeviceLabel(image: "trainer", name: "Trainer", state: connections[.trainer])
-                DeviceLabel(image: "hood", name: "Left", state: connections[.leftShifter])
-                DeviceLabel(image: "hood", mirrored: true, name: "Right", state: connections[.rightShifter])
+                DeviceLabel(image: "hood", name: "Ride", state: connections[.ride])
                 Spacer()
                 Button(action: openSettings) {
                     Image(systemName: "slider.horizontal.3")
@@ -38,7 +37,7 @@ struct DeviceBar: View {
         case .bluetoothOff: return "Turn on Bluetooth and allow SwiftGears to use it in Settings."
         case .noZwiftService: return "Your trainer has no Zwift shifting yet. Update it in the Wahoo app."
         case .locked: return "The Ride is locked. Open Zwift once to unlock it, then come back."
-        case .searching: return role == .trainer ? "Pedal to wake your trainer." : "Press a button on each hood to wake the Ride."
+        case .searching: return role == .trainer ? "Pedal to wake your trainer." : "Press a button on the Ride to wake it."
         case .connecting, .reconnecting: return role == .trainer ? "Connecting to your trainer…" : "Connecting to the Ride…"
         case .connected: return nil
         }
@@ -47,7 +46,6 @@ struct DeviceBar: View {
 
 struct DeviceLabel: View {
     let image: String
-    var mirrored = false
     let name: String
     let state: ConnectionState?
     @ScaledMetric(relativeTo: .subheadline) private var iconSize = 20
@@ -62,7 +60,6 @@ struct DeviceLabel: View {
                 .resizable()
                 .scaledToFit()
                 .frame(width: iconSize, height: iconSize)
-                .scaleEffect(x: mirrored ? -1 : 1)
             Text(name)
                 .font(.subheadline.weight(.semibold))
         }

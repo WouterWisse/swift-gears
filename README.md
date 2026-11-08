@@ -49,12 +49,12 @@ swift test
 
 The trainer and the Ride speak the same Bluetooth protocol: an opcode byte followed by a protobuf message.
 SwiftGears sends the trainer the gear message Zwift sends (gear ratio, bike and rider weight, on a flat road)
-and reads the button presses from both halves of the Ride.
+and reads the button presses from the Ride (its left half reports the buttons of both).
 
 | Where | What |
 | --- | --- |
 | [`Sources/GearsCore`](Sources/GearsCore) | The protocol, without any UI or Bluetooth: [messages](Sources/GearsCore/Zwift.swift), [gears](Sources/GearsCore/Gearbox.swift), [shifter buttons](Sources/GearsCore/ShiftDetector.swift) and [device recognition](Sources/GearsCore/DeviceRole.swift). Fully tested. |
-| [`App/Bluetooth`](App/Bluetooth) | [`ZwiftCentral`](App/Bluetooth/ZwiftCentral.swift) finds, connects and talks to the three devices. |
+| [`App/Bluetooth`](App/Bluetooth) | [`ZwiftCentral`](App/Bluetooth/ZwiftCentral.swift) finds, connects and talks to the trainer and the Ride. |
 | [`App/Model`](App/Model) | [`RideModel`](App/Model/RideModel.swift) holds the ride state and turns shifts into gear messages. |
 | [`App/Views`](App/Views) | The SwiftUI screens. |
 

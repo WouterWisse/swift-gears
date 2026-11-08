@@ -15,7 +15,7 @@ enum ConnectionState: Equatable {
     var needsAction: Bool { [.noZwiftService, .locked].contains(self) }
 }
 
-/// Finds the trainer and both Ride shifters, keeps them connected and speaks Zwift's protocol to them.
+/// Finds the trainer and the Ride, keeps them connected and speaks Zwift's protocol to them.
 /// It reports what happens through its callbacks and keeps no ride state of its own.
 final class ZwiftCentral: NSObject {
     var onStateChange: (DeviceRole, ConnectionState) -> Void = { _, _ in }
