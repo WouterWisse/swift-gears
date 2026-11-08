@@ -5,6 +5,8 @@ import GearsCore
 enum ConnectionState: Equatable {
     case searching, connecting, connected, reconnecting
     case bluetoothOff, noZwiftService, locked
+    /// The rider disconnected on purpose.
+    case disconnected
 
     var isConnected: Bool { self == .connected }
     /// Still looking for or connecting to the device.
@@ -40,6 +42,20 @@ final class ZwiftCentral: NSObject {
         central = CBCentralManager(delegate: self, queue: nil)
     }
 
+    /// Drops both devices and stops looking for them until the next `start`.
+    func stop() {
+        central?.stopScan()
+        for peripheral in peripherals.values { central?.cancelPeripheralConnection(peripheral) }
+        // Cleared first, so the disconnects that follow find no role to reconnect.
+        peripherals.removeAll()
+        controlPoints.removeAll()
+        detectors.removeAll()
+        trainerReady = false
+        central = nil
+        onRidingData(nil)
+        for role in DeviceRole.allCases { onStateChange(role, .disconnected) }
+    }
+
     func setGear(ratio: Double, bikeKg: Double, riderKg: Double) {
         guard trainerReady else { return }
         write(Zwift.gearCommand(ratio: ratio, bikeKg: bikeKg, riderKg: riderKg), to: .trainer)
@@ -70,6 +86,7 @@ final class ZwiftCentral: NSObject {
 
 extension ZwiftCentral: CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        guard central === self.central else { return } // one dropped by `stop()`
         guard central.state == .poweredOn else {
             for role in DeviceRole.allCases where controlPoints[role] == nil { onStateChange(role, .bluetoothOff) }
             return
@@ -79,6 +96,7 @@ extension ZwiftCentral: CBCentralManagerDelegate {
     }
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi: NSNumber) {
+        guard central === self.central else { return }
         let manufacturerData = (advertisementData[CBAdvertisementDataManufacturerDataKey] as? Data).map { [UInt8]($0) }
         let name = advertisementData[CBAdvertisementDataLocalNameKey] as? String ?? peripheral.name
         guard let role = DeviceRole(manufacturerData: manufacturerData, name: name), peripherals[role] == nil else { return }

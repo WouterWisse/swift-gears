@@ -10,7 +10,7 @@ struct RideView: View {
             DeviceBar(connections: model.connections) { showsSettings = true }
             Spacer(minLength: 12)
             GearReadout(gear: model.gearbox.gear)
-            GearRamp(gear: model.gearbox.gear, select: model.select(gear:))
+            GearRamp(gear: model.gearbox.gear, ratios: model.gearProfile.ratios, select: model.select(gear:))
                 .padding(.top, 24)
             Spacer(minLength: 12)
             MetricsView(power: model.power, cadence: model.cadence)

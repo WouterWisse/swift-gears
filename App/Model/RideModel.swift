@@ -11,9 +11,20 @@ final class RideModel {
     private(set) var connections: [DeviceRole: ConnectionState] = [:]
     private(set) var power: Int?
     private(set) var cadence: Int?
+    /// False after the rider disconnected, until they connect again.
+    private(set) var isConnecting = true
     var riderKg: Double {
         didSet {
             defaults.set(riderKg, forKey: Self.riderKgKey)
+            sendGear()
+        }
+    }
+
+    var gearProfile: GearProfile {
+        get { gearbox.profile }
+        set {
+            gearbox.profile = newValue
+            defaults.set(newValue.rawValue, forKey: Self.gearProfileKey)
             sendGear()
         }
     }
@@ -31,6 +42,7 @@ final class RideModel {
     @ObservationIgnored private let defaults: UserDefaults
 
     private static let riderKgKey = "riderKg"
+    private static let gearProfileKey = "gearProfile"
     private static let showsLiveActivityKey = "showsLiveActivity"
     // The trainer only needs a bike weight for its physics; on a flat road it barely matters.
     private static let bikeKg = 10.0
@@ -40,6 +52,7 @@ final class RideModel {
         self.central = central
         self.defaults = defaults
         riderKg = defaults.object(forKey: Self.riderKgKey) as? Double ?? 75
+        gearbox = Gearbox(profile: defaults.string(forKey: Self.gearProfileKey).flatMap(GearProfile.init(rawValue:)) ?? .standard)
         showsLiveActivity = defaults.object(forKey: Self.showsLiveActivityKey) as? Bool ?? true
 
         central?.onStateChange = { [weak self] role, state in self?.connections[role] = state }
@@ -63,8 +76,21 @@ final class RideModel {
         if gearbox.select(gear) { sendGear() }
     }
 
+    /// Ends the ride: drops both devices and the Live Activity.
+    func disconnect() {
+        isConnecting = false
+        liveActivity.stop() // first, so the cleared power and cadence don't update it
+        central?.stop()
+    }
+
+    func connect() {
+        isConnecting = true
+        central?.start()
+        startLiveActivity()
+    }
+
     func startLiveActivity() {
-        guard showsLiveActivity else { return }
+        guard showsLiveActivity, isConnecting else { return }
         liveActivity.start(with: activityState)
     }
 

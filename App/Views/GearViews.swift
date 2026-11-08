@@ -25,19 +25,19 @@ struct GearReadout: View {
 /// The 24 gears as bars as tall as their ratio, orange up to yours. Drag across it to pick a gear.
 struct GearRamp: View {
     let gear: Int
+    let ratios: [Double]
     let select: (Int) -> Void
     @State private var width: CGFloat = 1
 
-    private static let ratios = Gearbox.ratios
     private static let minBarHeight: CGFloat = 20
     private static let maxBarHeight: CGFloat = 128
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 3) {
-            ForEach(Self.ratios.indices, id: \.self) { index in
+            ForEach(ratios.indices, id: \.self) { index in
                 Capsule()
                     .fill(index < gear ? Color.zwift : Color.primary.opacity(0.1))
-                    .frame(height: Self.barHeight(Self.ratios[index]))
+                    .frame(height: barHeight(ratios[index]))
                     .frame(maxWidth: .infinity)
             }
         }
@@ -59,8 +59,8 @@ struct GearRamp: View {
         }
     }
 
-    private static func barHeight(_ ratio: Double) -> CGFloat {
+    private func barHeight(_ ratio: Double) -> CGFloat {
         let progress = (ratio - ratios[0]) / (ratios[ratios.count - 1] - ratios[0])
-        return minBarHeight + (maxBarHeight - minBarHeight) * progress
+        return Self.minBarHeight + (Self.maxBarHeight - Self.minBarHeight) * progress
     }
 }

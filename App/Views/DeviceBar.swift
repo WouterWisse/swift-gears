@@ -37,6 +37,7 @@ struct DeviceBar: View {
         case .bluetoothOff: return "Turn on Bluetooth and allow SwiftGears to use it in Settings."
         case .noZwiftService: return "Your trainer has no Zwift shifting yet. Update it in the Wahoo app."
         case .locked: return "The Ride is locked. Open Zwift once to unlock it, then come back."
+        case .disconnected: return "Disconnected. Connect again in Settings."
         case .searching: return role == .trainer ? "Pedal to wake your trainer." : "Press a button on the Ride to wake it."
         case .connecting, .reconnecting: return role == .trainer ? "Connecting to your trainer…" : "Connecting to the Ride…"
         case .connected: return nil

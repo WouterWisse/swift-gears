@@ -16,7 +16,8 @@ Wahoo KICKR CORE changes resistance, while you ride in whatever training app you
 ## What it does
 
 - **Shifts like Zwift.** The left shifters make it easier, the right shifters harder, through Zwift's own
-  24 gear ratios. The trainer works out the resistance itself, just as it does in Zwift.
+  24 gear ratios, or a Balanced set in Settings that leaves out the very light and very hard gears and
+  shifts in smaller steps. The trainer works out the resistance itself, just as it does in Zwift.
 - **Stays out of the way.** It keeps shifting in the background, so your training app can stay in front.
 - **Shows your gear at a glance.** A big gear number, the gear ramp, power and cadence. Drag across the
   ramp to jump to a gear. Gear, power and cadence also show on the Lock Screen and in the Dynamic Island

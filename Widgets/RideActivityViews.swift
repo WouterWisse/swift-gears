@@ -55,7 +55,8 @@ struct ActivityGearRamp: View {
     let gear: Int
     let height: CGFloat
 
-    private static let ratios = Gearbox.ratios
+    // shortcut: always the standard profile's shape, the Live Activity doesn't know the profile; send it in ContentState if the shapes ever drift apart.
+    private static let ratios = GearProfile.standard.ratios
 
     var body: some View {
         HStack(alignment: .bottom, spacing: 0) {
