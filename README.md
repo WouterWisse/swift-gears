@@ -11,8 +11,6 @@ Wahoo KICKR CORE changes resistance, while you ride in whatever training app you
     <source media="(prefers-color-scheme: dark)" srcset="docs/swiftgears-dark.gif">
     <img alt="Pressing the right shift paddle on the Zwift Ride shifts SwiftGears up from gear 12 to 16, the left one back down" src="docs/swiftgears-light.gif">
   </picture>
-  <br>
-  <sub><a href="docs/swiftgears.mp4">Watch it in full resolution</a></sub>
 </p>
 
 ## What it does
