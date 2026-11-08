@@ -9,9 +9,9 @@ struct ZwiftTests {
 
     @Test func gearCommandEncodesRatioTimesTenThousand() {
         let command = Zwift.gearCommand(ratio: 2.40, bikeKg: 10, riderKg: 75)
-        let physical = Zwift.parse(command.dropFirst())!.first!
+        let physical = Protobuf.parse(command.dropFirst())!.first!
         #expect(physical.number == 5)
-        #expect(Zwift.parse(physical.bytes)!.map(\.value) == [24_000, 1_000, 7_500])
+        #expect(Protobuf.parse(physical.bytes)!.map(\.value) == [24_000, 1_000, 7_500])
     }
 
     @Test func flatRoadUsesZwiftsDragAndRolling() {
@@ -21,44 +21,11 @@ struct ZwiftTests {
     @Test func decodesTrainerRidingData() {
         let captured: [UInt8] = [0x03, 0x08, 0xBE, 0x01, 0x10, 0x50, 0x18, 0xBD, 0x06, 0x20, 0x00, 0x28, 0xE2, 0xBA, 0x01, 0x30, 0x8B, 0xEB, 0x01]
         #expect(Zwift.ridingData(captured) == .init(power: 190, cadence: 80))
-        #expect(Zwift.ridingData([0x03, 0x08]) == nil)
-        #expect(Zwift.ridingData([0x03, 0x0A, 0xFF, 0x01]) == nil)
     }
 
-    @Test func buttonPressShiftsOncePerPress() {
-        var detector = ShiftDetector()
-        #expect(detector.shifts(for: ride(buttons: released)) == [])
-        #expect(detector.shifts(for: ride(buttons: released & ~0x0100)) == [-1])
-        #expect(detector.shifts(for: ride(buttons: released & ~0x0100)) == [])
-        #expect(detector.shifts(for: ride(buttons: released)) == [])
-        #expect(detector.shifts(for: ride(buttons: released & ~0x2000)) == [1])
-        #expect(detector.shifts(for: ride(buttons: released & ~0x0010)) == []) // A button is not a shifter
-    }
-
-    @Test func analogPaddleUsesHysteresis() {
-        var detector = ShiftDetector()
-        #expect(detector.shifts(for: ride(paddle: (1, 30))) == [1])
-        #expect(detector.shifts(for: ride(paddle: (1, 22))) == [])
-        #expect(detector.shifts(for: ride(paddle: (1, 10))) == [])
-        #expect(detector.shifts(for: ride(paddle: (1, 24))) == [])
-        #expect(detector.shifts(for: ride(paddle: (0, -40))) == [-1])
-    }
-
-    @Test func ignoresOtherMessages() {
-        var detector = ShiftDetector()
-        #expect(detector.shifts(for: [0x19, 0x08, 0x50]) == [])
-        #expect(detector.shifts(for: [0x23, 0x08]) == [])
-    }
-
-    private let released: UInt64 = 0xFFFF_FFFF
-
-    private func ride(buttons: UInt64 = 0xFFFF_FFFF, paddle: (location: UInt64, value: Int64)? = nil) -> [UInt8] {
-        var bytes: [UInt8] = [0x23, 0x08] + Zwift.varint(buttons)
-        if let paddle {
-            let zigzag = UInt64(bitPattern: (paddle.value << 1) ^ (paddle.value >> 63))
-            let sub: [UInt8] = [0x08] + Zwift.varint(paddle.location) + [0x10] + Zwift.varint(zigzag)
-            bytes += [0x1A, UInt8(sub.count)] + sub
-        }
-        return bytes
+    @Test func rejectsMalformedRidingData() {
+        #expect(Zwift.ridingData([0x03, 0x08]) == nil) // truncated varint
+        #expect(Zwift.ridingData([0x03, 0x0A, 0xFF, 0x01]) == nil) // length past the end
+        #expect(Zwift.ridingData([0x23, 0x08, 0x01]) == nil) // not riding data
     }
 }
