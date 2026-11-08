@@ -17,8 +17,10 @@ targets:
       - path: App/AppIcon.icon
         type: file
         buildPhase: resources
+      - path: Shared
     dependencies:
       - package: GearsCore
+      - target: SwiftGearsWidgets
     info:
       path: App/Info.plist
       properties:
@@ -27,6 +29,7 @@ targets:
         # Keeps shifting while another training app is in front or the phone is locked.
         UIBackgroundModes: [bluetooth-central]
         UILaunchScreen: {}
+        NSSupportsLiveActivities: true
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
     settings:
       base:
@@ -36,3 +39,25 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         CODE_SIGN_STYLE: Automatic
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+  # The Live Activity on the Lock Screen and in the Dynamic Island.
+  SwiftGearsWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Widgets
+      - path: Shared
+    dependencies:
+      - package: GearsCore
+    info:
+      path: Widgets/Info.plist
+      properties:
+        CFBundleDisplayName: SwiftGears
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.wouterwisse.swiftgears.widgets
+        DEVELOPMENT_TEAM: Q6AEA497G4
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        CODE_SIGN_STYLE: Automatic

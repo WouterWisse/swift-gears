@@ -13,6 +13,7 @@ struct SwiftGearsApp: App {
         #endif
         return RideModel()
     }()
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -20,6 +21,9 @@ struct SwiftGearsApp: App {
                 .tint(.zwiftInk)
                 // A ride screen: keep it on while the app is in front.
                 .onAppear { UIApplication.shared.isIdleTimerDisabled = true }
+                .onChange(of: scenePhase, initial: true) {
+                    if scenePhase == .active { model.startLiveActivity() }
+                }
         }
     }
 }

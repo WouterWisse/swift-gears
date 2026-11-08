@@ -1,5 +1,6 @@
 .build/
 *.xcodeproj/
 App/Info.plist
+Widgets/Info.plist
 .swiftpm/
 DerivedData/

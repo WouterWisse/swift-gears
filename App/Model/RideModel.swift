@@ -5,7 +5,9 @@ import Observation
 /// Everything the ride screen shows, and the gear changes it asks for.
 @Observable
 final class RideModel {
-    private(set) var gearbox = Gearbox()
+    private(set) var gearbox = Gearbox() {
+        didSet { liveActivity.update(activityState, urgent: true) }
+    }
     private(set) var connections: [DeviceRole: ConnectionState] = [:]
     private(set) var power: Int?
     private(set) var cadence: Int?
@@ -16,10 +18,20 @@ final class RideModel {
         }
     }
 
+    /// The rider's choice to show the ride on the Lock Screen and in the Dynamic Island.
+    var showsLiveActivity: Bool {
+        didSet {
+            defaults.set(showsLiveActivity, forKey: Self.showsLiveActivityKey)
+            if showsLiveActivity { startLiveActivity() } else { liveActivity.stop() }
+        }
+    }
+
     @ObservationIgnored private let central: ZwiftCentral?
+    @ObservationIgnored private let liveActivity = RideActivityController()
     @ObservationIgnored private let defaults: UserDefaults
 
     private static let riderKgKey = "riderKg"
+    private static let showsLiveActivityKey = "showsLiveActivity"
     // The trainer only needs a bike weight for its physics; on a flat road it barely matters.
     private static let bikeKg = 10.0
 
@@ -28,12 +40,16 @@ final class RideModel {
         self.central = central
         self.defaults = defaults
         riderKg = defaults.object(forKey: Self.riderKgKey) as? Double ?? 75
+        showsLiveActivity = defaults.object(forKey: Self.showsLiveActivityKey) as? Bool ?? true
 
         central?.onStateChange = { [weak self] role, state in self?.connections[role] = state }
         central?.onTrainerReady = { [weak self] in self?.sendGear() }
         central?.onRidingData = { [weak self] data in
-            self?.power = data?.power
-            self?.cadence = data?.cadence
+            guard let self else { return }
+            power = data?.power
+            cadence = data?.cadence
+            // Also when nothing changed: that keeps the Live Activity from going stale mid-ride.
+            liveActivity.update(activityState, urgent: false)
         }
         central?.onShift = { [weak self] delta in self?.shift(by: delta) }
         central?.start()
@@ -45,6 +61,15 @@ final class RideModel {
 
     func select(gear: Int) {
         if gearbox.select(gear) { sendGear() }
+    }
+
+    func startLiveActivity() {
+        guard showsLiveActivity else { return }
+        liveActivity.start(with: activityState)
+    }
+
+    private var activityState: RideActivityAttributes.ContentState {
+        .init(gear: gearbox.gear, gearCount: Gearbox.count, power: power, cadence: cadence)
     }
 
     private func sendGear() {

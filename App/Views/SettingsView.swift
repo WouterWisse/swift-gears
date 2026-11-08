@@ -17,6 +17,11 @@ struct SettingsView: View {
                     Text("The trainer uses your weight to work out how heavy each gear feels.")
                 }
                 Section {
+                    Toggle("Live Activity", isOn: $model.showsLiveActivity)
+                } footer: {
+                    Text("Shows your gear, watts and rpm on the Lock Screen and in the Dynamic Island while you ride.")
+                }
+                Section {
                     Link("Source code on GitHub", destination: Self.sourceURL)
                 } footer: {
                     Text("SwiftGears is not affiliated with Zwift or Wahoo.")

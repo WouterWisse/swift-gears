@@ -21,7 +21,8 @@ Wahoo KICKR CORE changes resistance, while you ride in whatever training app you
   24 gear ratios. The trainer works out the resistance itself, just as it does in Zwift.
 - **Stays out of the way.** It keeps shifting in the background, so your training app can stay in front.
 - **Shows your gear at a glance.** A big gear number, the gear ramp, power and cadence. Drag across the
-  ramp to jump to a gear.
+  ramp to jump to a gear. Gear, power and cadence also show on the Lock Screen and in the Dynamic Island
+  (you can turn that off in Settings).
 - **No account, no tracking.** It connects to your trainer and handlebars, and nothing else.
 
 <p align="center">
@@ -67,6 +68,7 @@ and reads the button presses from the Ride (its left half reports the buttons of
 | [`App/Bluetooth`](App/Bluetooth) | [`ZwiftCentral`](App/Bluetooth/ZwiftCentral.swift) finds, connects and talks to the trainer and the Ride. |
 | [`App/Model`](App/Model) | [`RideModel`](App/Model/RideModel.swift) holds the ride state and turns shifts into gear messages. |
 | [`App/Views`](App/Views) | The SwiftUI screens. |
+| [`App/LiveActivity`](App/LiveActivity), [`Widgets`](Widgets) | The Live Activity: [`RideActivityController`](App/LiveActivity/RideActivityController.swift) starts and updates it, the widget extension draws it. |
 
 The protocol was reverse engineered by others first. Thanks to:
 
