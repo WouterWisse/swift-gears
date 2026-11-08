@@ -8,6 +8,8 @@ Wahoo KICKR CORE changes resistance, while you ride in whatever training app you
 
 <p align="center">
   <img alt="Pressing the right shifter on the Zwift Ride shifts SwiftGears up from gear 12 to 16, the left shifter back down" src="docs/swiftgears.gif">
+  <br>
+  <sub><a href="docs/swiftgears.mp4">Watch it in full resolution</a></sub>
 </p>
 
 ## What it does
@@ -41,7 +43,8 @@ open SwiftGears.xcodeproj
 ```
 
 Choose your own team under **Signing & Capabilities** and run it on your iPhone. The simulator has no
-Bluetooth, so launch it there with the `-demo` argument to see a connected ride.
+Bluetooth, so launch it there with the `-demo` argument to see a connected ride, and add `-demo-loop` to make it
+shift up and down by itself, as in the video above.
 
 The protocol code is a Swift package with tests that run on your Mac:
 
