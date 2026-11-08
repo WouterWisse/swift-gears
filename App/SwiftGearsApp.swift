@@ -4,7 +4,12 @@ import SwiftUI
 struct SwiftGearsApp: App {
     @State private var model: RideModel = {
         #if DEBUG
-        if ProcessInfo.processInfo.arguments.contains("-demo") { return .demo() }
+        let arguments = ProcessInfo.processInfo.arguments
+        if arguments.contains("-demo") {
+            let model = RideModel.demo()
+            if arguments.contains("-demo-loop") { model.playDemoLoop() }
+            return model
+        }
         #endif
         return RideModel()
     }()

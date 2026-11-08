@@ -63,5 +63,22 @@ extension RideModel {
         model.cadence = 88
         return model
     }
+
+    /// Four shifts up and four back down every 7.4 s, forever: the rhythm of the README video
+    /// (launch with `-demo -demo-loop`). Times are absolute, so the loop never drifts.
+    func playDemoLoop() {
+        let shifts: [(at: Double, delta: Int)] = [0.88, 1.58, 2.28, 2.98].map { ($0, 1) } + [4.28, 4.98, 5.68, 6.38].map { ($0, -1) }
+        let period = 7.4
+        gearbox.select(12)
+        let start = ContinuousClock.now
+        Task { @MainActor in
+            for cycle in 0... {
+                for shift in shifts {
+                    try? await Task.sleep(until: start + .seconds(Double(cycle) * period + shift.at), clock: .continuous)
+                    self.shift(by: shift.delta)
+                }
+            }
+        }
+    }
 }
 #endif
