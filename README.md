@@ -7,7 +7,7 @@ Virtual shifting on your trainer without the Zwift app. Shift with the Zwift Rid
 Wahoo KICKR CORE changes resistance, while you ride in whatever training app you like.
 
 <p align="center">
-  <img alt="SwiftGears in light and dark mode, in gear 16 of 24" src="docs/screens.png" width="560">
+  <img alt="Pressing the right shifter on the Zwift Ride shifts SwiftGears up from gear 12 to 16, the left shifter back down" src="docs/swiftgears.gif">
 </p>
 
 ## What it does
@@ -18,6 +18,10 @@ Wahoo KICKR CORE changes resistance, while you ride in whatever training app you
 - **Shows your gear at a glance.** A big gear number, the gear ramp, power and cadence. Drag across the
   ramp to jump to a gear.
 - **No account, no tracking.** It connects to your trainer and handlebars, and nothing else.
+
+<p align="center">
+  <img alt="SwiftGears in light and dark mode, in gear 16 of 24" src="docs/screens.png" width="560">
+</p>
 
 ## What you need
 

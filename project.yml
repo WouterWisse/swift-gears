@@ -10,7 +10,13 @@ targets:
   SwiftGears:
     type: application
     platform: iOS
-    sources: [App]
+    sources:
+      - path: App
+        excludes: [AppIcon.icon/**]
+      # An Icon Composer document: one file to Xcode, layered Liquid Glass on iOS 26+.
+      - path: App/AppIcon.icon
+        type: file
+        buildPhase: resources
     dependencies:
       - package: GearsCore
     info:
