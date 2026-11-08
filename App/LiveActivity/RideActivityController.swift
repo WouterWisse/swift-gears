@@ -15,8 +15,11 @@ final class RideActivityController {
     private var isWanted = false
     private var throttle = UpdateThrottle<State>(interval: .seconds(1), refresh: .seconds(60))
     private var flush: Task<Void, Never>?
-    // Each update waits for the one before, so a quick run of shifts can't arrive out of order.
-    private var sending: Task<Void, Never>?
+    // One update at a time, so a quick run of shifts can't arrive out of order. While one is out, only the
+    // newest state waits: when iOS is slow to take updates in the background, the display skips ahead
+    // instead of working through a growing queue of old ones.
+    private var waiting: State?
+    private var isSending = false
 
     private var isRunning: Bool {
         activity?.activityState == .active || activity?.activityState == .stale
@@ -48,6 +51,7 @@ final class RideActivityController {
     func stop() {
         isWanted = false
         flush?.cancel()
+        waiting = nil
         activity = nil
         // Only the ones running now: switching back on right away must not end the new one.
         let running = Activity<RideActivityAttributes>.activities
@@ -75,11 +79,17 @@ final class RideActivityController {
     }
 
     private func send(_ state: State) {
-        guard let activity else { return }
-        let previous = sending
-        sending = Task { @MainActor in
-            await previous?.value
-            await activity.update(Self.content(state))
+        waiting = state
+        guard !isSending else { return }
+        isSending = true
+        Task { @MainActor in
+            while let state = waiting, let activity {
+                waiting = nil
+                let took = await ContinuousClock().measure { await activity.update(Self.content(state)) }
+                if took > .seconds(1) { Self.log.notice("A Live Activity update took \(took, privacy: .public)") }
+            }
+            waiting = nil
+            isSending = false
         }
     }
 
